@@ -1,6 +1,8 @@
 #ifndef PACIENTE_H
 #define PACIENTE_H
 
+
+
 class Paciente{
 public:
     int id;
@@ -18,6 +20,8 @@ public:
     Paciente(int ide, int categor, int rel, int du, int ses,
             int interrup, int tipoMaquina, int tiempoPS,
             int tiempoS, int a1, int a2, int a3, int a4, int a5);
+
 };
+
 
 #endif

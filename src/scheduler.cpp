@@ -4,8 +4,20 @@
 #include <fstream>
 #include <vector>
 
+
 #include "scheduler.h"
 #include "paciente.h"
+
+// Override () operator for sort Paciente's objects //
+struct sortComparator{
+    bool operator ()(Paciente const a, Paciente const b) const{
+        return (a.release < b.release) ||
+                ((a.release == b.release)  &&
+                    ((a.categoria > b.categoria) ||
+                        ((a.categoria == b.categoria) &&
+                            (a.sesiones < b.sesiones))));
+    }
+};
 
 Scheduler::Scheduler(){
     dias = 0;
@@ -46,5 +58,6 @@ int Scheduler::leerInstancia(std::string instancia){
         }
     }
     archivo.close();
+    std::sort(pacientes.begin(), pacientes.end(), sortComparator());
     return 0;
 }

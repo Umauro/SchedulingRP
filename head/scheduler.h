@@ -7,7 +7,11 @@
 #include <fstream>
 #include <vector>
 
+
+#include "scheduler.h"
 #include "paciente.h"
+
+struct sortComparator;
 
 class Scheduler{
 public:
