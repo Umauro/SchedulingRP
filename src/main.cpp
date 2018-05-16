@@ -16,6 +16,6 @@ int main(int args, char **argv){
     if(scheduler.leerInstancia(argv[1])){
         return 1;
     };
-    std::cout << "Está andando c:";
+    scheduler.constructorSolucion();
     return 0;
 }

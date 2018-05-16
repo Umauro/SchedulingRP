@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#include <list>
 
 
 #include "scheduler.h"
@@ -58,6 +59,12 @@ int Scheduler::leerInstancia(std::string instancia){
         }
     }
     archivo.close();
-    std::sort(pacientes.begin(), pacientes.end(), sortComparator());
     return 0;
+}
+
+void Scheduler::constructorSolucion(){
+    std::sort(pacientes.begin(), pacientes.end(), sortComparator());
+    int largoLista = (cantidadMaquina1+cantidadMaquina2)*dias;
+    capacidadMaquinas = std::list<int>(largoLista, tiempo);
+    schedule = std::list<int>(pacientes.size()*dias,0);
 }

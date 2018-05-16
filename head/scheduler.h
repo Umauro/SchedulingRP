@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
-
+#include <list>
 
 #include "scheduler.h"
 #include "paciente.h"
@@ -22,8 +22,11 @@ public:
     int cantidadMaquina1;
     int cantidadMaquina2;
     std::vector<Paciente> pacientes;
+    std::list<int> schedule;
+    std::list<int> capacidadMaquinas;
 
     Scheduler();
     int leerInstancia(std::string instancia);
+    void constructorSolucion();
 };
 #endif
