@@ -22,11 +22,21 @@ public:
     int cantidadMaquina1;
     int cantidadMaquina2;
     std::vector<Paciente> pacientes;
-    std::list<int> schedule;
-    std::list<int> capacidadMaquinas;
+    std::vector<Paciente> noAsignados;
+    std::vector<int> schedule;
+    std::vector<int> capacidadMaquinas;
 
     Scheduler();
     int leerInstancia(std::string instancia);
+    bool compPrimeraCapacidad(int j, Paciente paciente);
+    bool compCapacidad(int j, Paciente paciente);
+    int diaAsigIncompleta(int release, Paciente paciente);
+    int diaAsigCompleta(int release, Paciente paciente);
+    void asignar(int diaAsig, Paciente paciente);
+    void ASAP(Paciente paciente);
+    void JIP(Paciente paciente);
     void constructorSolucion();
+    float funcionObjetivo();
+    void printSolucion();
 };
 #endif

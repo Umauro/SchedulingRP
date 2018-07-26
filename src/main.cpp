@@ -17,5 +17,7 @@ int main(int args, char **argv){
         return 1;
     };
     scheduler.constructorSolucion();
+    scheduler.printSolucion();
+    std::cout << "No Asignados: " << scheduler.noAsignados.size() << "\n";
     return 0;
 }
