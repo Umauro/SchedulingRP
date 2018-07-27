@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <random>
+#include <cstdlib>
 
 #include "scheduler.h"
 #include "paciente.h"
@@ -302,7 +303,6 @@ void Scheduler::constructorSolucion(){
     std::sort(pacientes.begin(), pacientes.end(), sortComparator());
     int largoLista = (cantidadMaquina1+cantidadMaquina2)*dias;
     capacidadMaquinas = std::vector<int>(largoLista, tiempo);
-    schedule = std::vector<int>(pacientes.size()*dias,0); //ya no lo uso, debería borrarlo xD
     for(auto &i:pacientes){
         ASAP(i, capacidadMaquinas, asignados, noAsignados);
     }
@@ -356,7 +356,9 @@ void Scheduler::localSearch(){
     int randomNumber;
     float randomProb;
     float fitNuevo;
-    std::default_random_engine generador;
+    std::random_device rd;
+    std::mt19937 generador(rd());
+    //std::default_random_engine generador;
     std::uniform_int_distribution<int> distribucion(1, param1);
     std::uniform_real_distribution<> prob(0,1.0);
     for(int iteracion = 0; iteracion < iter; iteracion++){
@@ -366,6 +368,10 @@ void Scheduler::localSearch(){
         std::sort(nuevoAsignados.begin(), nuevoAsignados.end(), sortAsignado());
         randomNumber = distribucion(generador);
         for(int i = 0; i < randomNumber; i++){
+            randomProb = prob(generador);
+            if(randomProb < paramProb){
+                std::shuffle(nuevoAsignados.end()-10,nuevoAsignados.end(), generador);
+            }
             Paciente eliminado = nuevoAsignados.back();
             //std::cout<<"Eliminado: "<< eliminado.id << " "<< eliminado.inicio << " " << eliminado.sesiones << "\n";
             recalculador(nuevaCapacidad, eliminado);

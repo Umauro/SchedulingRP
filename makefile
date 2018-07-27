@@ -43,10 +43,10 @@ FIND = find
 CP = cp
 
 # Parameters
-INSTANCIA = instances/example_CL_1987.genera
+INSTANCIA = instances/CL_60_20_7.rad
 ITER = 100
 PARAM1 = 2
-PARAMPROB = 0
+PARAMPROB = 0.4
 
 # Makefile rules
 .PHONY: all
