@@ -63,7 +63,7 @@ int Scheduler::leerInstancia(std::string instancia){
     return 0;
 }
 
-bool Scheduler::compPrimeraCapacidad(int j, Paciente paciente){
+bool Scheduler::compPrimeraCapacidad(int j, Paciente &paciente){
     if(paciente.tipoMaquina == 2){
         if((capacidadMaquinas[j + dias] - (paciente.tiempoSesion+paciente.tiempoPrimeraSesion)) < 0){
             return false;
@@ -82,7 +82,7 @@ bool Scheduler::compPrimeraCapacidad(int j, Paciente paciente){
     }
 }
 
-bool Scheduler::compCapacidad(int j, Paciente paciente){
+bool Scheduler::compCapacidad(int j, Paciente &paciente){
     if(paciente.tipoMaquina == 2){
         if((capacidadMaquinas[j + dias] - paciente.tiempoSesion) < 0){
             return false;
@@ -101,7 +101,7 @@ bool Scheduler::compCapacidad(int j, Paciente paciente){
     }
 }
 
-int Scheduler::diaAsigIncompleta(int release, Paciente paciente){
+int Scheduler::diaAsigIncompleta(int release, Paciente &paciente){
     bool flag;
     bool primera;
     for(int i = (release - 1) ; i < dias; i++){
@@ -137,7 +137,7 @@ int Scheduler::diaAsigIncompleta(int release, Paciente paciente){
     }
     return 0;
 }
-int Scheduler::diaAsigCompleta(int release, Paciente paciente){
+int Scheduler::diaAsigCompleta(int release, Paciente &paciente){
     bool flag;
     bool primera;
     for(int i = (release - 1) ; i < paciente.due; i++){
@@ -174,13 +174,13 @@ int Scheduler::diaAsigCompleta(int release, Paciente paciente){
     return 0;
 }
 
-void Scheduler::asignar(int diaAsig, Paciente paciente){
+void Scheduler::asignar(int diaAsig, Paciente &paciente){
     int contador = 0;
     bool primera = true;
     for(int j = diaAsig; j < dias; j ++){
         if(contador == paciente.sesiones) break;
         paciente.schedulePaciente[j] = 1;
-        std::cout << paciente.schedulePaciente[j] << "\n";
+        paciente.tiempoEspera = diaAsig - paciente.release;
         contador++;
         if(paciente.tipoMaquina == 2){
             if(primera){
@@ -204,7 +204,7 @@ void Scheduler::asignar(int diaAsig, Paciente paciente){
 }
 
 
-void Scheduler::ASAP(Paciente paciente){
+void Scheduler::ASAP(Paciente &paciente){
     int release = paciente.release;
     int due = paciente.due;
     int diaAsig = 0;
@@ -248,19 +248,8 @@ float Scheduler::funcionObjetivo(){
 
 void Scheduler::printSolucion(){
     int counter = 0;
-    /**
-    for(auto &i:schedule){
-        if(counter % dias == 0){
-            std::cout << "\n ";
-        }
-        if(counter % diasTrabajo == 0){
-            std::cout << " ";
-        }
-        std::cout << i;
-        counter ++;
-    }
-    **/
     for(auto &i:pacientes){
+        std::cout << i.id <<":  ";
         for(unsigned int j = 0; j < i.schedulePaciente.size();j++){
             counter++;
             std::cout << i.schedulePaciente[j];

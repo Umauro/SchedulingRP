@@ -28,12 +28,12 @@ public:
 
     Scheduler();
     int leerInstancia(std::string instancia);
-    bool compPrimeraCapacidad(int j, Paciente paciente);
-    bool compCapacidad(int j, Paciente paciente);
-    int diaAsigIncompleta(int release, Paciente paciente);
-    int diaAsigCompleta(int release, Paciente paciente);
-    void asignar(int diaAsig, Paciente paciente);
-    void ASAP(Paciente paciente);
+    bool compPrimeraCapacidad(int j, Paciente &paciente);
+    bool compCapacidad(int j, Paciente &paciente);
+    int diaAsigIncompleta(int release, Paciente &paciente);
+    int diaAsigCompleta(int release, Paciente &paciente);
+    void asignar(int diaAsig, Paciente &paciente);
+    void ASAP(Paciente &paciente);
     void JIP(Paciente paciente);
     void constructorSolucion();
     float funcionObjetivo();

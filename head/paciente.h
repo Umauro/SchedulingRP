@@ -17,6 +17,7 @@ public:
     int disponibilidad[5];
     int sesionesRestantes;
     std::vector<int> schedulePaciente;
+    int tiempoEspera;
 
     Paciente(int ide, int categor, int rel, int du, int ses,
             int interrup, int tipoMaquina, int tiempoPS,
