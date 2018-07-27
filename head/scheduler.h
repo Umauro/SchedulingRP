@@ -47,6 +47,7 @@ public:
     void ASAP(Paciente &paciente, std::vector<int> &capacidades, std::vector<Paciente> &asig, std::vector<Paciente> &noAsig);
     void JIP(Paciente paciente);
     float funcionObjetivo();
+    float funcionObjetivo(std::vector<Paciente> candidato);
     void constructorSolucion();
     void metricas();
     void recalculador(std::vector<int> &capacidades, Paciente &paciente);

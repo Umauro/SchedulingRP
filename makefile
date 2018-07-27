@@ -45,8 +45,8 @@ CP = cp
 # Parameters
 INSTANCIA = instances/example_CL_1987.genera
 ITER = 100
-PARAM1 = 5
-PARAMPROB = 0.8
+PARAM1 = 2
+PARAMPROB = 0
 
 # Makefile rules
 .PHONY: all

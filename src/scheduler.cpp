@@ -32,10 +32,10 @@ struct sortNoAsignado{
 
 struct sortAsignado{
     bool operator ()(Paciente const a, Paciente const b) const{
-        return (a.tiempoEspera < b.tiempoEspera) ||
-                ((a.tiempoEspera == b.tiempoEspera) &&
-                    ((a.sesiones < b.sesiones) &&
-                        ((a.sesiones == b.sesiones) &&
+        return (a.sesiones < b.sesiones) ||
+                ((a.sesiones == b.sesiones) &&
+                    ((a.tiempoEspera < b.tiempoEspera) &&
+                        ((a.tiempoEspera == b.tiempoEspera) &&
                             (a.release > b.release))));
     }
 };
@@ -287,7 +287,15 @@ float Scheduler::funcionObjetivo(){
     for(auto &i:asignados){
         suma += i.tiempoEspera;
     }
-    return (suma/asignados.size());
+    return (suma/asignados.size())*(100*asignados.size());
+}
+
+float Scheduler::funcionObjetivo(std::vector<Paciente> candidato){
+    float suma = 0;
+    for(auto &i:candidato){
+        suma += i.tiempoEspera;
+    }
+    return (suma/candidato.size())*(100*asignados.size());
 }
 
 void Scheduler::constructorSolucion(){
@@ -338,14 +346,18 @@ void Scheduler::recalculador(std::vector<int> &capacidades, Paciente &paciente){
             capacidades[i] += paciente.tiempoSesion;
         }
     }
+    //Reseteo del paciente que fue sacado
     paciente.schedulePaciente = std::vector<int>(dias, 0);
+    paciente.inicio = -1;
+    paciente.fin = -1;
 }
 
 void Scheduler::localSearch(){
     int randomNumber;
     float randomProb;
+    float fitNuevo;
     std::default_random_engine generador;
-    std::uniform_int_distribution<int> distribucion(0, param1);
+    std::uniform_int_distribution<int> distribucion(1, param1);
     std::uniform_real_distribution<> prob(0,1.0);
     for(int iteracion = 0; iteracion < iter; iteracion++){
         std::vector<Paciente> nuevoAsignados = asignados;
@@ -355,14 +367,30 @@ void Scheduler::localSearch(){
         randomNumber = distribucion(generador);
         for(int i = 0; i < randomNumber; i++){
             Paciente eliminado = nuevoAsignados.back();
+            std::cout<<"Eliminado: "<< eliminado.id << " "<< eliminado.inicio << " " << eliminado.sesiones << "\n";
             recalculador(nuevaCapacidad, eliminado);
             nuevoNoAsignados.push_back(eliminado);
             nuevoAsignados.pop_back();
         }
-        std::sort(nuevoNoAsignados.begin(), nuevoNoAsignados.end(), sortNoAsignado());
+        //std::sort(nuevoNoAsignados.begin(), nuevoNoAsignados.end(), sortNoAsignado());
         randomProb = prob(generador);
         if(randomProb > paramProb){
             //usar ASAP para insertar.
+            for(unsigned int j = 0; j < nuevoNoAsignados.size();j++){
+                std::uniform_int_distribution<int> salvavidas(0, nuevoNoAsignados.size() - 1);
+                randomNumber = salvavidas(generador);
+                Paciente porAsignar = nuevoNoAsignados[randomNumber];
+                nuevoNoAsignados.erase(nuevoNoAsignados.begin()+randomNumber);
+                //std::cout<<"Por asignar: " << porAsignar.release << " " << porAsignar.sesiones << "\n";
+                ASAP(porAsignar, nuevaCapacidad, nuevoAsignados, nuevoNoAsignados);
+            }
+        }
+        fitNuevo = funcionObjetivo(nuevoAsignados);
+        if(fitNuevo < mejorSolucion){
+            mejorSolucion = fitNuevo;
+            asignados = nuevoAsignados;
+            noAsignados = nuevoNoAsignados;
+            capacidadMaquinas = nuevaCapacidad;
         }
     }
 
