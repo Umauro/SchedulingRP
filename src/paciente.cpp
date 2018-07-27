@@ -22,5 +22,5 @@ Paciente::Paciente(int ide, int categor, int rel,
     int disponibilidad[5] = {a1, a2, a3, a4, a5};
     this ->  sesionesRestantes = ses;
     this -> schedulePaciente = std::vector<int>(dias,0);
-    int tiempoEspera;
+    this -> tiempoEspera = -1;
 }

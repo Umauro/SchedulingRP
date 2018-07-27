@@ -23,6 +23,7 @@ public:
     int cantidadMaquina2;
     std::vector<Paciente> pacientes;
     std::vector<Paciente> noAsignados;
+    std::vector<Paciente> asignados;
     std::vector<int> schedule;
     std::vector<int> capacidadMaquinas;
 
