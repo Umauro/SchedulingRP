@@ -367,24 +367,24 @@ void Scheduler::localSearch(){
         randomNumber = distribucion(generador);
         for(int i = 0; i < randomNumber; i++){
             Paciente eliminado = nuevoAsignados.back();
-            std::cout<<"Eliminado: "<< eliminado.id << " "<< eliminado.inicio << " " << eliminado.sesiones << "\n";
+            //std::cout<<"Eliminado: "<< eliminado.id << " "<< eliminado.inicio << " " << eliminado.sesiones << "\n";
             recalculador(nuevaCapacidad, eliminado);
             nuevoNoAsignados.push_back(eliminado);
             nuevoAsignados.pop_back();
         }
         //std::sort(nuevoNoAsignados.begin(), nuevoNoAsignados.end(), sortNoAsignado());
         randomProb = prob(generador);
-        if(randomProb > paramProb){
+
             //usar ASAP para insertar.
-            for(unsigned int j = 0; j < nuevoNoAsignados.size();j++){
-                std::uniform_int_distribution<int> salvavidas(0, nuevoNoAsignados.size() - 1);
-                randomNumber = salvavidas(generador);
-                Paciente porAsignar = nuevoNoAsignados[randomNumber];
-                nuevoNoAsignados.erase(nuevoNoAsignados.begin()+randomNumber);
-                //std::cout<<"Por asignar: " << porAsignar.release << " " << porAsignar.sesiones << "\n";
-                ASAP(porAsignar, nuevaCapacidad, nuevoAsignados, nuevoNoAsignados);
-            }
+        for(unsigned int j = 0; j < nuevoNoAsignados.size()/4;j++){
+            std::uniform_int_distribution<int> salvavidas(0, nuevoNoAsignados.size() - 1);
+            randomNumber = salvavidas(generador);
+            Paciente porAsignar = nuevoNoAsignados[randomNumber];
+            nuevoNoAsignados.erase(nuevoNoAsignados.begin()+randomNumber);
+            //std::cout<<"Por asignar: " << porAsignar.release << " " << porAsignar.sesiones << "\n";
+            ASAP(porAsignar, nuevaCapacidad, nuevoAsignados, nuevoNoAsignados);
         }
+
         fitNuevo = funcionObjetivo(nuevoAsignados);
         if(fitNuevo < mejorSolucion){
             mejorSolucion = fitNuevo;
@@ -398,7 +398,18 @@ void Scheduler::localSearch(){
 
 void Scheduler::printSolucion(){
     int counter = 0;
-    for(auto &i:pacientes){
+    for(auto &i:asignados){
+        std::cout << i.id <<":  ";
+        for(unsigned int j = 0; j < i.schedulePaciente.size();j++){
+            counter++;
+            std::cout << i.schedulePaciente[j];
+            if(counter % diasTrabajo == 0){
+                std::cout << " ";
+            }
+        }
+        std::cout << " \n";
+    }
+    for(auto &i:noAsignados){
         std::cout << i.id <<":  ";
         for(unsigned int j = 0; j < i.schedulePaciente.size();j++){
             counter++;
