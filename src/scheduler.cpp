@@ -20,6 +20,26 @@ struct sortComparator{
     }
 };
 
+struct sortNoAsignado{
+    bool operator ()(Paciente const a, Paciente const b) const{
+        return (a.sesiones < b.sesiones) ||
+                ((a.sesiones == b.sesiones) &&
+                    ((a.release < b.release) ||
+                        ((a.release == b.release) &&
+                            (a.categoria > b.categoria))));
+    }
+};
+
+struct sortAsignado{
+    bool operator ()(Paciente const a, Paciente const b) const{
+        return (a.tiempoEspera > b.tiempoEspera) ||
+                ((a.tiempoEspera == b.tiempoEspera) &&
+                    ((a.sesiones > b.sesiones) &&
+                        ((a.sesiones == b.sesiones) &&
+                            (a.release < b.release))));
+    }
+};
+
 Scheduler::Scheduler(){
     dias = 0;
     diasTrabajo = 0;
@@ -291,6 +311,7 @@ void Scheduler::metricas(){
     std::cout << "Waiting urgent: " << (urgent/cantidadUrgent)*100 << "% \n";
     std::cout << "Waiting palliative: " << (palliative/cantidadPalliative)*100 << "% \n";
     std::cout << "Waiting radical: " << (radical/cantidadRadical)*100 << "% \n";
+    std::cout << "Total: " << ((urgent+palliative+radical)/pacientes.size())*100 << "% \n";
 }
 
 void Scheduler::printSolucion(){

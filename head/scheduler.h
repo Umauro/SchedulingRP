@@ -12,6 +12,8 @@
 #include "paciente.h"
 
 struct sortComparator;
+struct sortNoAsignado;
+struct sortAsignado;
 
 class Scheduler{
 public:
