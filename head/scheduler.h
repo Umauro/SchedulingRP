@@ -39,12 +39,12 @@ public:
 
     Scheduler(int iteraciones, int parametro1, float probabilidad);
     int leerInstancia(std::string instancia);
-    bool compPrimeraCapacidad(int j, Paciente &paciente);
-    bool compCapacidad(int j, Paciente &paciente);
-    int diaAsigIncompleta(int release, Paciente &paciente);
-    int diaAsigCompleta(int release, Paciente &paciente);
-    void asignar(int diaAsig, Paciente &paciente);
-    void ASAP(Paciente &paciente);
+    bool compPrimeraCapacidad(int j, Paciente &paciente, std::vector<int> &capacidades);
+    bool compCapacidad(int j, Paciente &paciente, std::vector<int> &capacidades);
+    int diaAsigIncompleta(int release, Paciente &paciente, std::vector<int> &capacidades);
+    int diaAsigCompleta(int release, Paciente &paciente, std::vector<int> &capacidades);
+    void asignar(int diaAsig, Paciente &paciente, std::vector<int> &capacidades);
+    void ASAP(Paciente &paciente, std::vector<int> &capacidades, std::vector<Paciente> &asig, std::vector<Paciente> &noAsig);
     void JIP(Paciente paciente);
     float funcionObjetivo();
     void constructorSolucion();
