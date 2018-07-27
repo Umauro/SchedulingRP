@@ -44,6 +44,7 @@ public:
     void constructorSolucion();
     float funcionObjetivo();
     void metricas();
+    void recalculador(std::vector<int> &capacidades, Paciente &paciente);
     void printSolucion();
 };
 #endif

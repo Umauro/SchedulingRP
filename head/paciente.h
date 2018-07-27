@@ -18,6 +18,8 @@ public:
     int sesionesRestantes;
     std::vector<int> schedulePaciente;
     int tiempoEspera;
+    int inicio;
+    int fin;
 
     Paciente(int ide, int categor, int rel, int du, int ses,
             int interrup, int tipoMaquina, int tiempoPS,

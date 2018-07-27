@@ -23,4 +23,6 @@ Paciente::Paciente(int ide, int categor, int rel,
     this ->  sesionesRestantes = ses;
     this -> schedulePaciente = std::vector<int>(dias,0);
     this -> tiempoEspera = -1;
+    this -> inicio = -1; //Van a guardar índices
+    this -> fin = -1; //Van a guardar índices
 }

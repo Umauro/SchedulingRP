@@ -22,21 +22,21 @@ struct sortComparator{
 
 struct sortNoAsignado{
     bool operator ()(Paciente const a, Paciente const b) const{
-        return (a.sesiones < b.sesiones) ||
+        return (a.sesiones > b.sesiones) ||
                 ((a.sesiones == b.sesiones) &&
-                    ((a.release < b.release) ||
+                    ((a.release > b.release) ||
                         ((a.release == b.release) &&
-                            (a.categoria > b.categoria))));
+                            (a.categoria < b.categoria))));
     }
 };
 
 struct sortAsignado{
     bool operator ()(Paciente const a, Paciente const b) const{
-        return (a.tiempoEspera > b.tiempoEspera) ||
+        return (a.tiempoEspera < b.tiempoEspera) ||
                 ((a.tiempoEspera == b.tiempoEspera) &&
-                    ((a.sesiones > b.sesiones) &&
+                    ((a.sesiones < b.sesiones) &&
                         ((a.sesiones == b.sesiones) &&
-                            (a.release < b.release))));
+                            (a.release > b.release))));
     }
 };
 
@@ -219,7 +219,11 @@ void Scheduler::asignar(int diaAsig, Paciente &paciente){
     int contador = 0;
     bool primera = true;
     for(int j = diaAsig; j < dias; j ++){
-        if(contador == paciente.sesiones) break;
+        if(contador == 0) paciente.inicio = j; //Se guarda el indice del inicio
+        if(contador == paciente.sesiones){
+            paciente.fin = j; //Se guarda el índice del fin
+            break;
+        }
         paciente.schedulePaciente[j] = 1;
         paciente.tiempoEspera = diaAsig - (paciente.release -1);
         contador++;
@@ -312,6 +316,25 @@ void Scheduler::metricas(){
     std::cout << "Waiting palliative: " << (palliative/cantidadPalliative)*100 << "% \n";
     std::cout << "Waiting radical: " << (radical/cantidadRadical)*100 << "% \n";
     std::cout << "Total: " << ((urgent+palliative+radical)/pacientes.size())*100 << "% \n";
+}
+
+void Scheduler::recalculador(std::vector<int> &capacidades, Paciente &paciente){
+    //Se actualizará el contador de capacidad de las máquinas desde el inicio al
+    //fin del tratamiento de un paciente.
+    //Se utiliza cuando se saca un paciente de la lista de asignados
+    if(paciente.tipoMaquina == 2){
+        capacidades[paciente.inicio + dias] += (paciente.tiempoSesion + paciente.tiempoPrimeraSesion);
+        for(int i = paciente.inicio + 1; i < paciente.fin + 1; i++){
+            capacidades[i + dias] += paciente.tiempoSesion;
+        }
+    }
+    else{
+        capacidades[paciente.inicio] += (paciente.tiempoSesion + paciente.tiempoPrimeraSesion);
+        for(int i = paciente.inicio + 1; i < paciente.fin + 1; i++){
+            capacidades[i] += paciente.tiempoSesion;
+        }
+    }
+    paciente.schedulePaciente = std::vector<int>(dias, 0);
 }
 
 void Scheduler::printSolucion(){
