@@ -44,7 +44,9 @@ CP = cp
 
 # Parameters
 INSTANCIA = instances/example_CL_1987.genera
-
+ITER = 100
+PARAM1 = 5
+PARAMPROB = 0.8
 
 # Makefile rules
 .PHONY: all
@@ -61,7 +63,7 @@ $(OBJDIR):
 
 .PHONY: run
 run:
-	./$(EXEC) $(INSTANCIA)  	
+	./$(EXEC) $(INSTANCIA) $(ITER) $(PARAM1) $(PARAMPROB)
 
 .PHONY: install
 install:

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <list>
+#include <random>
 
 #include "scheduler.h"
 #include "paciente.h"
@@ -17,6 +18,9 @@ struct sortAsignado;
 
 class Scheduler{
 public:
+    int iter;
+    int param1;
+    float paramProb;
     int dias;
     int diasTrabajo;
     int turnos;
@@ -31,8 +35,9 @@ public:
     std::vector<Paciente> asignados;
     std::vector<int> schedule;
     std::vector<int> capacidadMaquinas;
+    float mejorSolucion;
 
-    Scheduler();
+    Scheduler(int iteraciones, int parametro1, float probabilidad);
     int leerInstancia(std::string instancia);
     bool compPrimeraCapacidad(int j, Paciente &paciente);
     bool compCapacidad(int j, Paciente &paciente);
@@ -41,10 +46,11 @@ public:
     void asignar(int diaAsig, Paciente &paciente);
     void ASAP(Paciente &paciente);
     void JIP(Paciente paciente);
-    void constructorSolucion();
     float funcionObjetivo();
+    void constructorSolucion();
     void metricas();
     void recalculador(std::vector<int> &capacidades, Paciente &paciente);
+    void localSearch();
     void printSolucion();
 };
 #endif

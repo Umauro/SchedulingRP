@@ -4,7 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <list>
-
+#include <random>
 
 #include "scheduler.h"
 #include "paciente.h"
@@ -40,7 +40,10 @@ struct sortAsignado{
     }
 };
 
-Scheduler::Scheduler(){
+Scheduler::Scheduler(int iteraciones, int parametro1, float probabilidad){
+    iter = iteraciones;
+    param1 = parametro1;
+    paramProb = probabilidad;
     dias = 0;
     diasTrabajo = 0;
     turnos = 0;
@@ -279,22 +282,23 @@ void Scheduler::JIP(Paciente paciente){
     std::cout << "JIP" << "\n";
 }
 
-void Scheduler::constructorSolucion(){
-    std::sort(pacientes.begin(), pacientes.end(), sortComparator());
-    int largoLista = (cantidadMaquina1+cantidadMaquina2)*dias;
-    capacidadMaquinas = std::vector<int>(largoLista, tiempo);
-    schedule = std::vector<int>(pacientes.size()*dias,0);
-    for(auto &i:pacientes){
-        ASAP(i);
-    }
-}
-
 float Scheduler::funcionObjetivo(){
     float suma = 0;
     for(auto &i:asignados){
         suma += i.tiempoEspera;
     }
     return (suma/asignados.size());
+}
+
+void Scheduler::constructorSolucion(){
+    std::sort(pacientes.begin(), pacientes.end(), sortComparator());
+    int largoLista = (cantidadMaquina1+cantidadMaquina2)*dias;
+    capacidadMaquinas = std::vector<int>(largoLista, tiempo);
+    schedule = std::vector<int>(pacientes.size()*dias,0); //ya no lo uso, debería borrarlo xD
+    for(auto &i:pacientes){
+        ASAP(i);
+    }
+    mejorSolucion = funcionObjetivo();
 }
 
 void Scheduler::metricas(){
@@ -335,6 +339,33 @@ void Scheduler::recalculador(std::vector<int> &capacidades, Paciente &paciente){
         }
     }
     paciente.schedulePaciente = std::vector<int>(dias, 0);
+}
+
+void Scheduler::localSearch(){
+    int randomNumber;
+    float randomProb;
+    std::default_random_engine generador;
+    std::uniform_int_distribution<int> distribucion(0, param1);
+    std::uniform_real_distribution<> prob(0,1.0);
+    for(int iteracion = 0; iteracion < iter; iteracion++){
+        std::vector<Paciente> nuevoAsignados = asignados;
+        std::vector<Paciente> nuevoNoAsignados = noAsignados;
+        std::vector<int> nuevaCapacidad = capacidadMaquinas;
+        std::sort(nuevoAsignados.begin(), nuevoAsignados.end(), sortAsignado());
+        randomNumber = distribucion(generador);
+        for(int i = 0; i < randomNumber; i++){
+            Paciente eliminado = nuevoAsignados.back();
+            recalculador(nuevaCapacidad, eliminado);
+            nuevoNoAsignados.push_back(eliminado);
+            nuevoAsignados.pop_back();
+        }
+        std::sort(nuevoNoAsignados.begin(), nuevoNoAsignados.end(), sortNoAsignado());
+        randomProb = prob(generador);
+        if(randomProb > paramProb){
+            //usar ASAP para insertar.
+        }
+    }
+
 }
 
 void Scheduler::printSolucion(){

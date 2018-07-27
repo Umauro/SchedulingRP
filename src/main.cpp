@@ -8,11 +8,11 @@
 
 
 int main(int args, char **argv){
-    if(args != 2){
+    if(args != 5){
         std::cout << "Cantidad de Parámetros Incorrectos";
         return 1;
     }
-    Scheduler scheduler = Scheduler();
+    Scheduler scheduler = Scheduler(atoi(argv[2]),atoi(argv[3]), atof(argv[4]));
     if(scheduler.leerInstancia(argv[1])){
         return 1;
     };
