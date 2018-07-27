@@ -21,6 +21,9 @@ public:
     int tiempo;
     int cantidadMaquina1;
     int cantidadMaquina2;
+    int cantidadUrgent;
+    int cantidadPalliative;
+    int cantidadRadical;
     std::vector<Paciente> pacientes;
     std::vector<Paciente> noAsignados;
     std::vector<Paciente> asignados;
@@ -38,6 +41,7 @@ public:
     void JIP(Paciente paciente);
     void constructorSolucion();
     float funcionObjetivo();
+    void metricas();
     void printSolucion();
 };
 #endif

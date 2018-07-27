@@ -27,6 +27,9 @@ Scheduler::Scheduler(){
     tiempo = 0;
     cantidadMaquina1 = 0;
     cantidadMaquina2 = 0;
+    cantidadUrgent = 0;
+    cantidadPalliative = 0;
+    cantidadRadical = 0;
     pacientes = std::vector<Paciente>();
     noAsignados = std::vector<Paciente>();
     asignados = std::vector<Paciente>();
@@ -36,6 +39,9 @@ int Scheduler::leerInstancia(std::string instancia){
     int e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12,
     e13, test;
     int idCounter = 1;
+    int urgentCounter = 0;
+    int palliativeCounter = 0;
+    int radicalCounter = 0;
     std::ifstream archivo(instancia);
     if(!archivo.good()){
         std::cout << "Error al leer la instancia \n";
@@ -57,10 +63,22 @@ int Scheduler::leerInstancia(std::string instancia){
             Paciente paciente(idCounter, e1, e2, e3, e4, e5, e6, e7, e8,
                 e9, e10, e11, e12, e13, dias);
             pacientes.push_back(paciente);
+            if(e1 == 1){
+                urgentCounter++;
+            }
+            else if(e1 == 2){
+                palliativeCounter++;
+            }
+            else{
+                radicalCounter++;
+            }
             idCounter++;
         }
     }
     archivo.close();
+    cantidadUrgent = urgentCounter;
+    cantidadPalliative = palliativeCounter;
+    cantidadRadical = radicalCounter;
     return 0;
 }
 
@@ -152,31 +170,19 @@ int Scheduler::diaAsigCompleta(int release, Paciente &paciente){
                     break;
                 }
                 if(compPrimeraCapacidad(j, paciente)){
-                    if(paciente.id == 3){
-                        std::cout << "tiro falso \n";
-                    }
                     primera = false;
                 }
                 else{
                     flag = false;
-                    if(paciente.id == 3){
-                        std::cout << "tiro falso P\n";
-                    }
                     break;
                 }
             }
             else{
                 if(compCapacidad(j, paciente)){
-                    if(paciente.id == 3){
-                        std::cout << "tiro falso \n";
-                    }
                     primera = false;
                 }
                 else{
                     flag = false;
-                    if(paciente.id == 3){
-                        std::cout << "tiro falso \n";
-                    }
                     break;
                 }
             }
@@ -265,6 +271,26 @@ float Scheduler::funcionObjetivo(){
         suma += i.tiempoEspera;
     }
     return (suma/asignados.size());
+}
+
+void Scheduler::metricas(){
+    float urgent = 0;
+    float palliative = 0;
+    float radical = 0;
+    for(auto &i: noAsignados){
+        if(i.categoria == 1){
+            urgent += 1;
+        }
+        else if(i.categoria == 2){
+            palliative += 1;
+        }
+        else{
+            radical += 1;
+        }
+    }
+    std::cout << "Waiting urgent: " << (urgent/cantidadUrgent)*100 << "% \n";
+    std::cout << "Waiting palliative: " << (palliative/cantidadPalliative)*100 << "% \n";
+    std::cout << "Waiting radical: " << (radical/cantidadRadical)*100 << "% \n";
 }
 
 void Scheduler::printSolucion(){

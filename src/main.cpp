@@ -17,9 +17,10 @@ int main(int args, char **argv){
         return 1;
     };
     scheduler.constructorSolucion();
-    scheduler.printSolucion();
+    //scheduler.printSolucion();
     std::cout << "Asignados: " << scheduler.asignados.size() << "\n";
     std::cout << "No Asignados: " << scheduler.noAsignados.size() << "\n";
     std::cout << "Avg waiting time: " << scheduler.funcionObjetivo() <<"\n";
+    scheduler.metricas();
     return 0;
 }
