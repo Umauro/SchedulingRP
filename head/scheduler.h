@@ -23,6 +23,8 @@ public:
     int param1;
     float paramProb;
     int temp;
+    float multi;
+    int iterTemp;
     int dias;
     int diasTrabajo;
     int turnos;
@@ -38,7 +40,7 @@ public:
     std::vector<int> capacidadMaquinas;
     float mejorSolucion;
 
-    Scheduler(int iteraciones, int parametro1, float probabilidad, int temperatura);
+    Scheduler(int iteraciones, int parametro1, float probabilidad, int temperatura, float multiplicador, int iterTemperatura);
     int leerInstancia(std::string instancia);
     bool compPrimeraCapacidad(int j, Paciente &paciente, std::vector<int> &capacidades);
     bool compCapacidad(int j, Paciente &paciente, std::vector<int> &capacidades);

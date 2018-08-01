@@ -44,10 +44,12 @@ CP = cp
 
 # Parameters
 INSTANCIA = instances/CL_60_20_7.rad
-ITER = 100
+ITER = 1000
 PARAM1 = 2
 PARAMPROB = 0.4
 TEMP = 100
+MULTI = 0.98
+ITERTEMP = 100;
 
 # Makefile rules
 .PHONY: all
@@ -64,7 +66,7 @@ $(OBJDIR):
 
 .PHONY: run
 run:
-	./$(EXEC) $(INSTANCIA) $(ITER) $(PARAM1) $(PARAMPROB) $(TEMP)
+	./$(EXEC) $(INSTANCIA) $(ITER) $(PARAM1) $(PARAMPROB) $(TEMP) $(MULTI) $(ITERTEMP)
 
 .PHONY: install
 install:

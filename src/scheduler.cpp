@@ -41,11 +41,13 @@ struct sortAsignado{
     }
 };
 
-Scheduler::Scheduler(int iteraciones, int parametro1, float probabilidad, int temperatura){
+Scheduler::Scheduler(int iteraciones, int parametro1, float probabilidad, int temperatura, float multiplicador, int iterTemperatura){
     iter = iteraciones;
     param1 = parametro1;
     paramProb = probabilidad;
     temp = temperatura;
+    multi = multiplicador;
+    iterTemp = iterTemperatura;
     dias = 0;
     diasTrabajo = 0;
     turnos = 0;
