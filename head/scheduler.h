@@ -8,6 +8,7 @@
 #include <vector>
 #include <list>
 #include <random>
+#include <cstdlib>
 
 #include "scheduler.h"
 #include "paciente.h"
@@ -33,7 +34,6 @@ public:
     std::vector<Paciente> pacientes;
     std::vector<Paciente> noAsignados;
     std::vector<Paciente> asignados;
-    std::vector<int> schedule;
     std::vector<int> capacidadMaquinas;
     float mejorSolucion;
 
