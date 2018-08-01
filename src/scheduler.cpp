@@ -41,10 +41,11 @@ struct sortAsignado{
     }
 };
 
-Scheduler::Scheduler(int iteraciones, int parametro1, float probabilidad){
+Scheduler::Scheduler(int iteraciones, int parametro1, float probabilidad, int temperatura){
     iter = iteraciones;
     param1 = parametro1;
     paramProb = probabilidad;
+    temp = temperatura;
     dias = 0;
     diasTrabajo = 0;
     turnos = 0;
@@ -353,6 +354,7 @@ void Scheduler::recalculador(std::vector<int> &capacidades, Paciente &paciente){
 }
 
 void Scheduler::localSearch(){
+    unsigned int cantidadMinima = pacientes.size();
     int randomNumber;
     float randomProb;
     float fitNuevo;
@@ -392,7 +394,7 @@ void Scheduler::localSearch(){
         }
 
         fitNuevo = funcionObjetivo(nuevoAsignados);
-        if(fitNuevo < mejorSolucion){
+        if(fitNuevo < mejorSolucion and nuevoAsignados.size() >= cantidadMinima){
             mejorSolucion = fitNuevo;
             asignados = nuevoAsignados;
             noAsignados = nuevoNoAsignados;
