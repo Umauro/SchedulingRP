@@ -6,6 +6,7 @@
 #include <list>
 #include <random>
 #include <cstdlib>
+#include <cmath>
 
 #include "scheduler.h"
 #include "paciente.h"
@@ -41,7 +42,7 @@ struct sortAsignado{
     }
 };
 
-Scheduler::Scheduler(int iteraciones, int parametro1, float probabilidad, int temperatura, float multiplicador, int iterTemperatura){
+Scheduler::Scheduler(int iteraciones, int parametro1, float probabilidad, float temperatura, float multiplicador, int iterTemperatura){
     iter = iteraciones;
     param1 = parametro1;
     paramProb = probabilidad;
@@ -291,7 +292,7 @@ float Scheduler::funcionObjetivo(){
     for(auto &i:asignados){
         suma += i.tiempoEspera;
     }
-    return (suma/asignados.size())*(100*asignados.size());
+    return (suma/asignados.size());
 }
 
 float Scheduler::funcionObjetivo(std::vector<Paciente> candidato){
@@ -299,7 +300,7 @@ float Scheduler::funcionObjetivo(std::vector<Paciente> candidato){
     for(auto &i:candidato){
         suma += i.tiempoEspera;
     }
-    return (suma/candidato.size())*(100*asignados.size());
+    return (suma/candidato.size());
 }
 
 void Scheduler::constructorSolucion(){
@@ -327,10 +328,11 @@ void Scheduler::metricas(){
             radical += 1;
         }
     }
-    std::cout << "Waiting urgent: " << (urgent/cantidadUrgent)*100 << "% \n";
-    std::cout << "Waiting palliative: " << (palliative/cantidadPalliative)*100 << "% \n";
-    std::cout << "Waiting radical: " << (radical/cantidadRadical)*100 << "% \n";
-    std::cout << "Total: " << ((urgent+palliative+radical)/pacientes.size())*100 << "% \n";
+    std::cout << (urgent/cantidadUrgent) << " " << (palliative/cantidadPalliative) << " " << (radical/cantidadRadical) << " " << ((urgent+palliative+radical)/pacientes.size()) <<"\n";
+    //std::cout << "Waiting urgent: " << (urgent/cantidadUrgent) << "% \n";
+    //std::cout << "Waiting palliative: " << (palliative/cantidadPalliative) << "% \n";
+    //std::cout << "Waiting radical: " << (radical/cantidadRadical) << "% \n";
+    //std::cout << "Total: " << ((urgent+palliative+radical)/pacientes.size()) << "% \n";
 }
 
 void Scheduler::recalculador(std::vector<int> &capacidades, Paciente &paciente){
@@ -356,7 +358,8 @@ void Scheduler::recalculador(std::vector<int> &capacidades, Paciente &paciente){
 }
 
 void Scheduler::localSearch(){
-    unsigned int cantidadMinima = pacientes.size();
+    unsigned int cantidadMinima = asignados.size();
+    float delta;
     int randomNumber;
     float randomProb;
     float fitNuevo;
@@ -365,46 +368,88 @@ void Scheduler::localSearch(){
     //std::default_random_engine generador;
     std::uniform_int_distribution<int> distribucion(1, param1);
     std::uniform_real_distribution<> prob(0,1.0);
+
+    // Para guardar la solución actual
+    int solucionActual = mejorSolucion;
+    std::vector<Paciente> asignadosActual = asignados;
+    std::vector<Paciente> noAsignadosActual = noAsignados;
+    std::vector<int> capacidadActual = capacidadMaquinas;
+
     for(int iteracion = 0; iteracion < iter; iteracion++){
-        std::vector<Paciente> nuevoAsignados = asignados;
-        std::vector<Paciente> nuevoNoAsignados = noAsignados;
-        std::vector<int> nuevaCapacidad = capacidadMaquinas;
-        std::sort(nuevoAsignados.begin(), nuevoAsignados.end(), sortAsignado());
-        randomNumber = distribucion(generador);
-        for(int i = 0; i < randomNumber; i++){
-            randomProb = prob(generador);
-            if(randomProb < paramProb){
-                std::shuffle(nuevoAsignados.end()-10,nuevoAsignados.end(), generador);
+        for(int saIter = 0; saIter < iterTemp; saIter ++){
+            std::vector<Paciente> nuevoAsignados = asignadosActual;
+            std::vector<Paciente> nuevoNoAsignados = noAsignadosActual;
+            std::vector<int> nuevaCapacidad = capacidadActual;
+            std::sort(nuevoAsignados.begin(), nuevoAsignados.end(), sortAsignado());
+            randomNumber = distribucion(generador);
+            for(int i = 0; i < randomNumber; i++){
+                randomProb = prob(generador);
+                if(randomProb < paramProb){
+                    std::shuffle(nuevoAsignados.end()-(nuevoAsignados.size()/2),nuevoAsignados.end(), generador);
+                }
+                Paciente eliminado = nuevoAsignados.back();
+                //std::cout<<"Eliminado: "<< eliminado.id << " "<< eliminado.inicio << " " << eliminado.sesiones << "\n";
+                recalculador(nuevaCapacidad, eliminado);
+                nuevoNoAsignados.push_back(eliminado);
+                nuevoAsignados.pop_back();
             }
-            Paciente eliminado = nuevoAsignados.back();
-            //std::cout<<"Eliminado: "<< eliminado.id << " "<< eliminado.inicio << " " << eliminado.sesiones << "\n";
-            recalculador(nuevaCapacidad, eliminado);
-            nuevoNoAsignados.push_back(eliminado);
-            nuevoAsignados.pop_back();
-        }
-        //std::sort(nuevoNoAsignados.begin(), nuevoNoAsignados.end(), sortNoAsignado());
-        randomProb = prob(generador);
+            std::sort(nuevoNoAsignados.begin(), nuevoNoAsignados.end(), sortNoAsignado());
+            randomProb = prob(generador);
 
-            //usar ASAP para insertar.
-        for(unsigned int j = 0; j < nuevoNoAsignados.size()/4;j++){
-            std::uniform_int_distribution<int> salvavidas(0, nuevoNoAsignados.size() - 1);
-            randomNumber = salvavidas(generador);
-            Paciente porAsignar = nuevoNoAsignados[randomNumber];
-            nuevoNoAsignados.erase(nuevoNoAsignados.begin()+randomNumber);
-            //std::cout<<"Por asignar: " << porAsignar.release << " " << porAsignar.sesiones << "\n";
-            ASAP(porAsignar, nuevaCapacidad, nuevoAsignados, nuevoNoAsignados);
-        }
+                //usar ASAP para insertar.
+            for(unsigned int j = 0; j < nuevoNoAsignados.size()/4;j++){
+                std::uniform_int_distribution<int> salvavidas(0, nuevoNoAsignados.size() - 1);
+                randomNumber = salvavidas(generador);
+                Paciente porAsignar = nuevoNoAsignados[randomNumber];
+                nuevoNoAsignados.erase(nuevoNoAsignados.begin()+randomNumber);
+                //std::cout<<"Por asignar: " << porAsignar.release << " " << porAsignar.sesiones << "\n";
+                ASAP(porAsignar, nuevaCapacidad, nuevoAsignados, nuevoNoAsignados);
+            }
 
-        fitNuevo = funcionObjetivo(nuevoAsignados);
-        if(fitNuevo < mejorSolucion and nuevoAsignados.size() >= cantidadMinima){
-            mejorSolucion = fitNuevo;
-            asignados = nuevoAsignados;
-            noAsignados = nuevoNoAsignados;
-            capacidadMaquinas = nuevaCapacidad;
+            fitNuevo = funcionObjetivo(nuevoAsignados);
+            delta = solucionActual - fitNuevo;
+            //std::cout << delta << "\n";
+
+            //std::cout <<"Exponencial: " << exp(delta/temp)<< "Delta: " << delta << "Temperatura: " << temp << "\n";
+
+            //std::cout << "Nuevo asignados: "<<nuevoNoAsignados.size() << " cantidadMinima " << cantidadMinima<< "\n";
+            //Si solución nueva es mejor que la actual se actualiza
+            if(delta > 0 and nuevoAsignados.size() >= cantidadMinima){
+                //std::cout << "Entré\n";
+                solucionActual = fitNuevo;
+                asignadosActual = nuevoAsignados;
+                noAsignadosActual = nuevoNoAsignados;
+                capacidadActual = nuevaCapacidad;
+            }
+            //Generar número para ver si se acepta algo peor//
+
+            else if(prob(generador) < exp(delta/temp)){
+                solucionActual = fitNuevo;
+                asignadosActual = nuevoAsignados;
+                noAsignadosActual = nuevoNoAsignados;
+                capacidadActual = nuevaCapacidad;
+            }
+            //Verificar si la solución actual es mejor que la mejor
+            if(solucionActual < mejorSolucion and asignadosActual.size() >= cantidadMinima){
+                //std::cout << "Encontré algo mejor\n";
+                mejorSolucion = solucionActual;
+                asignados = asignadosActual;
+                noAsignados = noAsignadosActual;
+                capacidadMaquinas = capacidadActual;
+            }
+        }
+        temp = temp * multi;
+        //std::cout << temp << "\n";
+        if(temp < 0.00001){
+            //std::cout << "RECALENTAR!\n";
+            temp = 1;
+            solucionActual = mejorSolucion;
+            asignadosActual = asignados;
+            noAsignadosActual = noAsignados;
+            capacidadActual = capacidadMaquinas;
         }
         //std::cout << iteracion << " " << mejorSolucion/(100*asignados.size()) << " " << asignados.size() << " \n";
     }
-
 }
 
 void Scheduler::printSolucion(){
